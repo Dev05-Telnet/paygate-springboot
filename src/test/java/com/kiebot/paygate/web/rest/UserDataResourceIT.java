@@ -10,7 +10,6 @@ import com.kiebot.paygate.domain.UserData;
 import com.kiebot.paygate.repository.UserDataRepository;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,8 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser
 class UserDataResourceIT {
 
-    private static final UUID DEFAULT_REFER_ID = UUID.randomUUID();
-    private static final UUID UPDATED_REFER_ID = UUID.randomUUID();
+    private static final Integer DEFAULT_REFER_ID = 1;
+    private static final Integer UPDATED_REFER_ID = 2;
 
     private static final String DEFAULT_TOKEN = "AAAAAAAAAA";
     private static final String UPDATED_TOKEN = "BBBBBBBBBB";
@@ -151,7 +150,7 @@ class UserDataResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(userData.getId().intValue())))
-            .andExpect(jsonPath("$.[*].referId").value(hasItem(DEFAULT_REFER_ID.toString())))
+            .andExpect(jsonPath("$.[*].referId").value(hasItem(DEFAULT_REFER_ID)))
             .andExpect(jsonPath("$.[*].token").value(hasItem(DEFAULT_TOKEN)))
             .andExpect(jsonPath("$.[*].payGateID").value(hasItem(DEFAULT_PAY_GATE_ID)))
             .andExpect(jsonPath("$.[*].payGateSecret").value(hasItem(DEFAULT_PAY_GATE_SECRET)));
@@ -169,7 +168,7 @@ class UserDataResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(userData.getId().intValue()))
-            .andExpect(jsonPath("$.referId").value(DEFAULT_REFER_ID.toString()))
+            .andExpect(jsonPath("$.referId").value(DEFAULT_REFER_ID))
             .andExpect(jsonPath("$.token").value(DEFAULT_TOKEN))
             .andExpect(jsonPath("$.payGateID").value(DEFAULT_PAY_GATE_ID))
             .andExpect(jsonPath("$.payGateSecret").value(DEFAULT_PAY_GATE_SECRET));

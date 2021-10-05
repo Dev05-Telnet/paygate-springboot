@@ -17,13 +17,19 @@ const baseHref = document.querySelector('base').getAttribute('href').replace(/\/
 export const PayCred = () => {
   const [paygateStatus, setPaygateStatus] = useState('Not configured');
   const userId = useParams();
-  const click = (event, values) => {
+  const click = async (event, values) => {
+    const response = await axios.post(
+      `/api/update/${userId['userId']}?paygateId=${values.paygateId}&paygateSecret=${values.paygateSecret}`
+    );
     // eslint-disable-next-line no-console
-    console.log(userId);
+    console.log(response);
+    if (response.status === 200) {
+      setPaygateStatus('Configured');
+      toast.success(response.data);
+    } else toast.error(response.data);
   };
   return (
     <div>
-      <ToastContainer />
       <BgContainer>
         <WhiteContainer>
           <p>Paygate configuration Status : {paygateStatus}</p>

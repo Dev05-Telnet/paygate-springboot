@@ -43,6 +43,7 @@ module.exports = options =>
       stats: options.stats,
       hot: true,
       contentBase: './build/resources/main/static/',
+      disableHostCheck: true,
       port: 9060,
       proxy: [
         {

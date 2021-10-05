@@ -1,7 +1,6 @@
 package com.kiebot.paygate.domain;
 
 import java.io.Serializable;
-import java.util.UUID;
 import javax.persistence.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -22,7 +21,7 @@ public class UserData extends AbstractAuditingEntity implements Serializable {
     private Long id;
 
     @Column(name = "refer_id")
-    private UUID referId;
+    private Integer referId;
 
     @Column(name = "token")
     private String token;
@@ -47,16 +46,16 @@ public class UserData extends AbstractAuditingEntity implements Serializable {
         return this;
     }
 
-    public UUID getReferId() {
+    public Integer getReferId() {
         return this.referId;
     }
 
-    public UserData referId(UUID referId) {
+    public UserData referId(Integer referId) {
         this.referId = referId;
         return this;
     }
 
-    public void setReferId(UUID referId) {
+    public void setReferId(Integer referId) {
         this.referId = referId;
     }
 
@@ -123,7 +122,7 @@ public class UserData extends AbstractAuditingEntity implements Serializable {
     public String toString() {
         return "UserData{" +
             "id=" + getId() +
-            ", referId='" + getReferId() + "'" +
+            ", referId=" + getReferId() +
             ", token='" + getToken() + "'" +
             ", payGateID='" + getPayGateID() + "'" +
             ", payGateSecret='" + getPayGateSecret() + "'" +

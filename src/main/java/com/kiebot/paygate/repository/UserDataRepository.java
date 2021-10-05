@@ -9,4 +9,7 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface UserDataRepository extends JpaRepository<UserData, Long> {}
+public interface UserDataRepository extends JpaRepository<UserData, Long> {
+    @Query("select usd from UserData usd where usd.id = :id")
+    UserData getDataById(Long id);
+}

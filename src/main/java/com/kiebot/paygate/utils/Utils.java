@@ -1,6 +1,9 @@
 package com.kiebot.paygate.utils;
 
 import java.lang.reflect.*;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -114,5 +117,32 @@ public class Utils {
                 );
             }
         };
+    }
+
+    HashMap<String, String> formToMap(String form) {
+        HashMap<String, String> map = new HashMap<>();
+        for (String pair : form.split("&")) {
+            String[] split = pair.split("=");
+            map.put(split[0], split[1]);
+        }
+        return map;
+    }
+
+    public static String md5(String text) {
+        try {
+            MessageDigest m = MessageDigest.getInstance("MD5");
+            m.reset();
+            m.update(text.getBytes());
+            byte[] digest = m.digest();
+            BigInteger bigInt = new BigInteger(1, digest);
+            StringBuilder hashtext = new StringBuilder(bigInt.toString(16));
+            while (hashtext.length() < 32) {
+                hashtext.insert(0, "0");
+            }
+            return hashtext.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

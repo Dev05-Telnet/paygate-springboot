@@ -1,6 +1,6 @@
 export interface IUserData {
   id?: number;
-  referId?: string | null;
+  referId?: number | null;
   token?: string | null;
   payGateID?: string | null;
   payGateSecret?: string | null;

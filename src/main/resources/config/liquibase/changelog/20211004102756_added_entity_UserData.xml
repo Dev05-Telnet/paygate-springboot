@@ -14,7 +14,10 @@
             <column name="id" type="bigserial">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="refer_id" type="integer">
+            <column name="user_id" type="integer">
+                    <constraints nullable="true" />
+            </column>
+            <column name="store" type="varchar(255)">
                     <constraints nullable="true" />
             </column>
             <column name="token" type="varchar(255)">
@@ -53,7 +56,8 @@
                   separator=";"
                   tableName="user_data">
             <column name="id" type="numeric"/>
-            <column name="refer_id" type="numeric"/>
+            <column name="user_id" type="numeric"/>
+            <column name="store" type="string"/>
             <column name="token" type="string"/>
             <column name="pay_gate_id" type="string"/>
             <column name="pay_gate_secret" type="string"/>

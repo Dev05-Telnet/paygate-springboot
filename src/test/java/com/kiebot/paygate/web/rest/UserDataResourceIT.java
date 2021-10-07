@@ -29,8 +29,11 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser
 class UserDataResourceIT {
 
-    private static final Integer DEFAULT_REFER_ID = 1;
-    private static final Integer UPDATED_REFER_ID = 2;
+    private static final Integer DEFAULT_USER_ID = 1;
+    private static final Integer UPDATED_USER_ID = 2;
+
+    private static final String DEFAULT_STORE = "AAAAAAAAAA";
+    private static final String UPDATED_STORE = "BBBBBBBBBB";
 
     private static final String DEFAULT_TOKEN = "AAAAAAAAAA";
     private static final String UPDATED_TOKEN = "BBBBBBBBBB";
@@ -66,7 +69,8 @@ class UserDataResourceIT {
      */
     public static UserData createEntity(EntityManager em) {
         UserData userData = new UserData()
-            .referId(DEFAULT_REFER_ID)
+            .userId(DEFAULT_USER_ID)
+            .store(DEFAULT_STORE)
             .token(DEFAULT_TOKEN)
             .payGateID(DEFAULT_PAY_GATE_ID)
             .payGateSecret(DEFAULT_PAY_GATE_SECRET);
@@ -81,7 +85,8 @@ class UserDataResourceIT {
      */
     public static UserData createUpdatedEntity(EntityManager em) {
         UserData userData = new UserData()
-            .referId(UPDATED_REFER_ID)
+            .userId(UPDATED_USER_ID)
+            .store(UPDATED_STORE)
             .token(UPDATED_TOKEN)
             .payGateID(UPDATED_PAY_GATE_ID)
             .payGateSecret(UPDATED_PAY_GATE_SECRET);
@@ -110,7 +115,8 @@ class UserDataResourceIT {
         List<UserData> userDataList = userDataRepository.findAll();
         assertThat(userDataList).hasSize(databaseSizeBeforeCreate + 1);
         UserData testUserData = userDataList.get(userDataList.size() - 1);
-        assertThat(testUserData.getReferId()).isEqualTo(DEFAULT_REFER_ID);
+        assertThat(testUserData.getUserId()).isEqualTo(DEFAULT_USER_ID);
+        assertThat(testUserData.getStore()).isEqualTo(DEFAULT_STORE);
         assertThat(testUserData.getToken()).isEqualTo(DEFAULT_TOKEN);
         assertThat(testUserData.getPayGateID()).isEqualTo(DEFAULT_PAY_GATE_ID);
         assertThat(testUserData.getPayGateSecret()).isEqualTo(DEFAULT_PAY_GATE_SECRET);
@@ -150,7 +156,8 @@ class UserDataResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(userData.getId().intValue())))
-            .andExpect(jsonPath("$.[*].referId").value(hasItem(DEFAULT_REFER_ID)))
+            .andExpect(jsonPath("$.[*].userId").value(hasItem(DEFAULT_USER_ID)))
+            .andExpect(jsonPath("$.[*].store").value(hasItem(DEFAULT_STORE)))
             .andExpect(jsonPath("$.[*].token").value(hasItem(DEFAULT_TOKEN)))
             .andExpect(jsonPath("$.[*].payGateID").value(hasItem(DEFAULT_PAY_GATE_ID)))
             .andExpect(jsonPath("$.[*].payGateSecret").value(hasItem(DEFAULT_PAY_GATE_SECRET)));
@@ -168,7 +175,8 @@ class UserDataResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(userData.getId().intValue()))
-            .andExpect(jsonPath("$.referId").value(DEFAULT_REFER_ID))
+            .andExpect(jsonPath("$.userId").value(DEFAULT_USER_ID))
+            .andExpect(jsonPath("$.store").value(DEFAULT_STORE))
             .andExpect(jsonPath("$.token").value(DEFAULT_TOKEN))
             .andExpect(jsonPath("$.payGateID").value(DEFAULT_PAY_GATE_ID))
             .andExpect(jsonPath("$.payGateSecret").value(DEFAULT_PAY_GATE_SECRET));
@@ -194,7 +202,8 @@ class UserDataResourceIT {
         // Disconnect from session so that the updates on updatedUserData are not directly saved in db
         em.detach(updatedUserData);
         updatedUserData
-            .referId(UPDATED_REFER_ID)
+            .userId(UPDATED_USER_ID)
+            .store(UPDATED_STORE)
             .token(UPDATED_TOKEN)
             .payGateID(UPDATED_PAY_GATE_ID)
             .payGateSecret(UPDATED_PAY_GATE_SECRET);
@@ -211,7 +220,8 @@ class UserDataResourceIT {
         List<UserData> userDataList = userDataRepository.findAll();
         assertThat(userDataList).hasSize(databaseSizeBeforeUpdate);
         UserData testUserData = userDataList.get(userDataList.size() - 1);
-        assertThat(testUserData.getReferId()).isEqualTo(UPDATED_REFER_ID);
+        assertThat(testUserData.getUserId()).isEqualTo(UPDATED_USER_ID);
+        assertThat(testUserData.getStore()).isEqualTo(UPDATED_STORE);
         assertThat(testUserData.getToken()).isEqualTo(UPDATED_TOKEN);
         assertThat(testUserData.getPayGateID()).isEqualTo(UPDATED_PAY_GATE_ID);
         assertThat(testUserData.getPayGateSecret()).isEqualTo(UPDATED_PAY_GATE_SECRET);
@@ -289,7 +299,7 @@ class UserDataResourceIT {
         UserData partialUpdatedUserData = new UserData();
         partialUpdatedUserData.setId(userData.getId());
 
-        partialUpdatedUserData.payGateSecret(UPDATED_PAY_GATE_SECRET);
+        partialUpdatedUserData.payGateID(UPDATED_PAY_GATE_ID);
 
         restUserDataMockMvc
             .perform(
@@ -303,10 +313,11 @@ class UserDataResourceIT {
         List<UserData> userDataList = userDataRepository.findAll();
         assertThat(userDataList).hasSize(databaseSizeBeforeUpdate);
         UserData testUserData = userDataList.get(userDataList.size() - 1);
-        assertThat(testUserData.getReferId()).isEqualTo(DEFAULT_REFER_ID);
+        assertThat(testUserData.getUserId()).isEqualTo(DEFAULT_USER_ID);
+        assertThat(testUserData.getStore()).isEqualTo(DEFAULT_STORE);
         assertThat(testUserData.getToken()).isEqualTo(DEFAULT_TOKEN);
-        assertThat(testUserData.getPayGateID()).isEqualTo(DEFAULT_PAY_GATE_ID);
-        assertThat(testUserData.getPayGateSecret()).isEqualTo(UPDATED_PAY_GATE_SECRET);
+        assertThat(testUserData.getPayGateID()).isEqualTo(UPDATED_PAY_GATE_ID);
+        assertThat(testUserData.getPayGateSecret()).isEqualTo(DEFAULT_PAY_GATE_SECRET);
     }
 
     @Test
@@ -322,7 +333,8 @@ class UserDataResourceIT {
         partialUpdatedUserData.setId(userData.getId());
 
         partialUpdatedUserData
-            .referId(UPDATED_REFER_ID)
+            .userId(UPDATED_USER_ID)
+            .store(UPDATED_STORE)
             .token(UPDATED_TOKEN)
             .payGateID(UPDATED_PAY_GATE_ID)
             .payGateSecret(UPDATED_PAY_GATE_SECRET);
@@ -339,7 +351,8 @@ class UserDataResourceIT {
         List<UserData> userDataList = userDataRepository.findAll();
         assertThat(userDataList).hasSize(databaseSizeBeforeUpdate);
         UserData testUserData = userDataList.get(userDataList.size() - 1);
-        assertThat(testUserData.getReferId()).isEqualTo(UPDATED_REFER_ID);
+        assertThat(testUserData.getUserId()).isEqualTo(UPDATED_USER_ID);
+        assertThat(testUserData.getStore()).isEqualTo(UPDATED_STORE);
         assertThat(testUserData.getToken()).isEqualTo(UPDATED_TOKEN);
         assertThat(testUserData.getPayGateID()).isEqualTo(UPDATED_PAY_GATE_ID);
         assertThat(testUserData.getPayGateSecret()).isEqualTo(UPDATED_PAY_GATE_SECRET);

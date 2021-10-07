@@ -20,8 +20,11 @@ public class UserData extends AbstractAuditingEntity implements Serializable {
     @SequenceGenerator(name = "user_data_id_seq", allocationSize = 1)
     private Long id;
 
-    @Column(name = "refer_id")
-    private Integer referId;
+    @Column(name = "user_id")
+    private Integer userId;
+
+    @Column(name = "store")
+    private String store;
 
     @Column(name = "token")
     private String token;
@@ -46,17 +49,30 @@ public class UserData extends AbstractAuditingEntity implements Serializable {
         return this;
     }
 
-    public Integer getReferId() {
-        return this.referId;
+    public Integer getUserId() {
+        return this.userId;
     }
 
-    public UserData referId(Integer referId) {
-        this.referId = referId;
+    public UserData userId(Integer userId) {
+        this.userId = userId;
         return this;
     }
 
-    public void setReferId(Integer referId) {
-        this.referId = referId;
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public String getStore() {
+        return this.store;
+    }
+
+    public UserData store(String store) {
+        this.store = store;
+        return this;
+    }
+
+    public void setStore(String store) {
+        this.store = store;
     }
 
     public String getToken() {
@@ -122,7 +138,8 @@ public class UserData extends AbstractAuditingEntity implements Serializable {
     public String toString() {
         return "UserData{" +
             "id=" + getId() +
-            ", referId=" + getReferId() +
+            ", userId=" + getUserId() +
+            ", store='" + getStore() + "'" +
             ", token='" + getToken() + "'" +
             ", payGateID='" + getPayGateID() + "'" +
             ", payGateSecret='" + getPayGateSecret() + "'" +

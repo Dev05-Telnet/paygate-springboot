@@ -50,7 +50,8 @@ export const UserData = (props: RouteComponentProps<{ url: string }>) => {
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Refer Id</th>
+                <th>User Id</th>
+                <th>Store</th>
                 <th>Token</th>
                 <th>Pay Gate ID</th>
                 <th>Pay Gate Secret</th>
@@ -65,7 +66,8 @@ export const UserData = (props: RouteComponentProps<{ url: string }>) => {
                       {userData.id}
                     </Button>
                   </td>
-                  <td>{userData.referId}</td>
+                  <td>{userData.userId}</td>
+                  <td>{userData.store}</td>
                   <td>{userData.token}</td>
                   <td>{userData.payGateID}</td>
                   <td>{userData.payGateSecret}</td>

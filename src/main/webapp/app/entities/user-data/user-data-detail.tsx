@@ -26,9 +26,13 @@ export const UserDataDetail = (props: RouteComponentProps<{ id: string }>) => {
           </dt>
           <dd>{userDataEntity.id}</dd>
           <dt>
-            <span id="referId">Refer Id</span>
+            <span id="userId">User Id</span>
           </dt>
-          <dd>{userDataEntity.referId}</dd>
+          <dd>{userDataEntity.userId}</dd>
+          <dt>
+            <span id="store">Store</span>
+          </dt>
+          <dd>{userDataEntity.store}</dd>
           <dt>
             <span id="token">Token</span>
           </dt>

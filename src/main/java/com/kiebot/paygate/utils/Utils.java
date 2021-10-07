@@ -119,7 +119,7 @@ public class Utils {
         };
     }
 
-    HashMap<String, String> formToMap(String form) {
+    public static HashMap<String, String> formToMap(String form) {
         HashMap<String, String> map = new HashMap<>();
         for (String pair : form.split("&")) {
             String[] split = pair.split("=");

@@ -83,7 +83,8 @@ export const UserDataUpdate = (props: RouteComponentProps<{ id: string }>) => {
                   validate={{ required: true }}
                 />
               ) : null}
-              <ValidatedField label="Refer Id" id="user-data-referId" name="referId" data-cy="referId" type="text" />
+              <ValidatedField label="User Id" id="user-data-userId" name="userId" data-cy="userId" type="text" />
+              <ValidatedField label="Store" id="user-data-store" name="store" data-cy="store" type="text" />
               <ValidatedField label="Token" id="user-data-token" name="token" data-cy="token" type="text" />
               <ValidatedField
                 label="Pay Gate ID"

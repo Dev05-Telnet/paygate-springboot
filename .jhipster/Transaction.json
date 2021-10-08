@@ -1,0 +1,24 @@
+{
+  "name": "Transaction",
+  "fields": [
+    {
+      "fieldName": "orderId",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "payRequestId",
+      "fieldType": "String"
+    }
+  ],
+  "relationships": [],
+  "entityTableName": "transaction",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211007091153"
+}

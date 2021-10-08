@@ -1,0 +1,40 @@
+{
+  "name": "UserData",
+  "fields": [
+    {
+      "fieldName": "userId",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "store",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "token",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "payGateID",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "payGateSecret",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "scriptId",
+      "fieldType": "String"
+    }
+  ],
+  "relationships": [],
+  "entityTableName": "user_data",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211004102756"
+}

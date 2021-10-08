@@ -145,4 +145,93 @@ public class Utils {
         }
         return null;
     }
+
+    public static final String getInjectionScript(String host, Long userId) {
+        return (
+            "<script>\n" +
+            "    function loadGateway(payRequestId, checksum, root) {\n" +
+            "        const form = document.createElement(\"form\");\n" +
+            "        form.setAttribute(\n" +
+            "            \"action\",\n" +
+            "            \"https://secure.paygate.co.za/payweb3/process.trans\"\n" +
+            "        );\n" +
+            "        form.setAttribute(\"method\", \"POST\");\n" +
+            "        form.setAttribute(\"id\", \"paygate\");\n" +
+            "        form.setAttribute(\"target\", \"pay\");\n" +
+            "\n" +
+            "        const requestInput = document.createElement(\"input\");\n" +
+            "        const checksumInput = document.createElement(\"input\");\n" +
+            "\n" +
+            "        requestInput.setAttribute(\"type\", \"hidden\");\n" +
+            "        requestInput.setAttribute(\"name\", \"PAY_REQUEST_ID\");\n" +
+            "        requestInput.setAttribute(\"value\", payRequestId);\n" +
+            "\n" +
+            "        checksumInput.setAttribute(\"type\", \"hidden\");\n" +
+            "        checksumInput.setAttribute(\"name\", \"CHECKSUM\");\n" +
+            "        checksumInput.setAttribute(\"value\", checksum);\n" +
+            "\n" +
+            "        form.appendChild(requestInput);\n" +
+            "        form.appendChild(checksumInput);\n" +
+            "\n" +
+            "        root.appendChild(form);\n" +
+            "\n" +
+            "        document.forms[\"paygate\"].submit();\n" +
+            "        window.open(\"\", \"pay\");\n" +
+            "    }\n" +
+            "    const mutation = new MutationObserver(()=> {\n" +
+            "        const root = document.getElementsByClassName(\"layout-main\")[0];\n" +
+            "        console.log(root)\n" +
+            "        if(root === null || root === undefined) return;\n" +
+            "        mutation.disconnect();\n" +
+            "        const backup = root.innerHTML;\n" +
+            "        root.innerHTML = '<div class=\"loadingOverlay optimizedCheckout-overlay\"></div>';\n" +
+            "        const eventMethod = window.addEventListener\n" +
+            "        ? \"addEventListener\"\n" +
+            "        : \"attachEvent\";\n" +
+            "        const eventListener = window[eventMethod];\n" +
+            "        const messageEvent = eventMethod == \"attachEvent\" ? \"onmessage\" : \"message\";\n" +
+            "        eventListener(\n" +
+            "        messageEvent,\n" +
+            "        async function (e) {\n" +
+            "            if(e.origin !== \"" +
+            host +
+            "\") return\n" +
+            "            const key = e.message ? \"message\" : \"data\";\n" +
+            "            const data = e[key];\n" +
+            "            const end = await fetch(\"" +
+            host +
+            "/api/status/" +
+            userId +
+            "/{{checkout.order.id}}\", {method: \"POST\"});\n" +
+            "            console.log(\"reload\");\n" +
+            "            window.location.reload();\n" +
+            "        },false);\n" +
+            "\n" +
+            "        fetch(\"" +
+            host +
+            "/api/process/" +
+            userId +
+            "/{{checkout.order.id}}\", {\n" +
+            "        method: \"POST\",\n" +
+            "        }).then((response) =>\n" +
+            "        response.json().then((data) => {\n" +
+            "            if (JSON.stringify(data) === \"{}\") root.innerHTML = backup;\n" +
+            "            else {\n" +
+            "            frame = document.createElement(\"iframe\");\n" +
+            "            frame.setAttribute(\"width\", \"100%\");\n" +
+            "            frame.setAttribute(\"height\", \"500px\");\n" +
+            "            frame.setAttribute(\"name\", \"pay\");\n" +
+            "            root.innerHTML = \"\";\n" +
+            "            root.appendChild(frame);\n" +
+            "            const checksum = data[\"CHECKSUM\"];\n" +
+            "            const payRequestId = data[\"PAY_REQUEST_ID\"];\n" +
+            "            loadGateway(payRequestId, checksum, root);\n" +
+            "            }\n" +
+            "        }));\n" +
+            "    });\n" +
+            "    const rootCheckoutDiv = document.getElementById(\"checkout-app\");\n" +
+            "    mutation.observe(rootCheckoutDiv, { attributes: true, childList: true })\n" +
+            " </script>"
+        );
+    }
 }

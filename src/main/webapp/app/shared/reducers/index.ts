@@ -14,6 +14,8 @@ import settings, { SettingsState } from 'app/modules/account/settings/settings.r
 import passwordReset, { PasswordResetState } from 'app/modules/account/password-reset/password-reset.reducer';
 // prettier-ignore
 import userData from 'app/entities/user-data/user-data.reducer';
+// prettier-ignore
+import transaction from 'app/entities/transaction/transaction.reducer';
 /* jhipster-needle-add-reducer-import - JHipster will add reducer here */
 
 const rootReducer = {
@@ -27,6 +29,7 @@ const rootReducer = {
   password,
   settings,
   userData,
+  transaction,
   /* jhipster-needle-add-reducer-combine - JHipster will add reducer here */
   loadingBar,
 };

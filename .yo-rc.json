@@ -43,7 +43,7 @@
     "devServerPort": 9060,
     "clientPackageManager": "npm",
     "languages": ["en", "fr"],
-    "entities": ["UserData"],
-    "lastLiquibaseTimestamp": 1633343276000
+    "entities": ["UserData", "Transaction"],
+    "lastLiquibaseTimestamp": 1633597913000
   }
 }

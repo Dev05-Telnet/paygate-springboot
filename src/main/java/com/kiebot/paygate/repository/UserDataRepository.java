@@ -10,6 +10,9 @@ import org.springframework.stereotype.Repository;
 @SuppressWarnings("unused")
 @Repository
 public interface UserDataRepository extends JpaRepository<UserData, Long> {
-    @Query("select usd from UserData usd where usd.id = :id")
-    UserData getDataById(Long id);
+    @Query(
+        value = "select * from user_data usd where usd.user_id = :id order by created_date desc limit 1",
+        nativeQuery = true
+    )
+    UserData getDataByUserId(int id);
 }

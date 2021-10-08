@@ -1,10 +1,14 @@
 package com.kiebot.paygate.web.rest;
 
+import com.kiebot.paygate.domain.Transaction;
 import com.kiebot.paygate.domain.UserData;
+import com.kiebot.paygate.repository.TransactionRepository;
 import com.kiebot.paygate.repository.UserDataRepository;
 import com.kiebot.paygate.utils.Utils;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
@@ -29,9 +33,13 @@ public class UserDataResource {
     private final Logger log = LoggerFactory.getLogger(UserDataResource.class);
     public final String clientID = "je9b53p5syz1qnav9cozg6u61jrfojs";
     public final String clientSecret = "afb8227f93aaf6a19c0785c709f0dfc130d172395e7fe3f228016dcbce6e0978";
-    public final String host = "https://1f2e-103-146-175-87.ngrok.io";
+    public final String host = "https://103c-103-153-104-184.ngrok.io";
     public final OkHttpClient client = new OkHttpClient();
     public final UserDataRepository userDataRepository;
+    public final TransactionRepository transactionRepository;
+
+    @SuppressWarnings("FieldCanBeLocal")
+    private final String paymentName = "Paygate Pay";
 
     String currency = "ZAR";
     String return_url = host + "/api/completed";
@@ -40,8 +48,9 @@ public class UserDataResource {
     String mail = "customer@kiebot.za";
     String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
 
-    public UserDataResource(UserDataRepository userDataRepository) {
+    public UserDataResource(UserDataRepository userDataRepository, TransactionRepository transactionRepository) {
         this.userDataRepository = userDataRepository;
+        this.transactionRepository = transactionRepository;
     }
 
     /**
@@ -92,6 +101,17 @@ public class UserDataResource {
         }
     }
 
+    @GetMapping("/load")
+    public ModelAndView load(@RequestParam("signed_payload") String payload) {
+        String data = payload.split("\\.")[0];
+        JSONObject userInfo = new JSONObject(new String(Base64.getDecoder().decode(data)));
+        int userId = userInfo.getJSONObject("user").getInt("id");
+        UserData user = userDataRepository.getDataByUserId(userId);
+        return user != null
+            ? new ModelAndView("redirect:" + host + "/update/" + user.getId() + "?script=false")
+            : new ModelAndView("redirect:" + host + "/404.html");
+    }
+
     @PostMapping("update/{id}")
     @CrossOrigin("*")
     public ResponseEntity<String> update(
@@ -99,7 +119,7 @@ public class UserDataResource {
         @RequestParam("paygateId") String payId,
         @RequestParam("paygateSecret") String paySecret
     ) {
-        UserData data = userDataRepository.getDataById(id);
+        UserData data = userDataRepository.getOne(id);
         String storeHash = data.getStore();
         data.setPayGateID(payId);
         data.setPayGateSecret(paySecret);
@@ -107,18 +127,13 @@ public class UserDataResource {
 
         String key = data.getToken();
         String url = "https://api.bigcommerce.com/stores/" + storeHash + "/v3/content/scripts";
-        System.out.println(url);
+        String script = Utils.getInjectionScript(host, data.getId());
+        System.out.println(script);
         JSONObject requestBody = new JSONObject();
         requestBody
-            .put("name", "paygate-checkout")
+            .put("name", "paygate-payment-gateway")
             .put("Discription", "Checkout script for integrating Paygate in bigcommerce")
-            .put(
-                "html",
-                "<script>\n" +
-                "    var orderId = {{checkout.order.id}};\n" +
-                "    console.log(orderId);\n" +
-                "</script>"
-            )
+            .put("html", script)
             .put("auto_uninstall", true)
             .put("load_method", "default")
             .put("location", "footer")
@@ -154,10 +169,10 @@ public class UserDataResource {
         @PathVariable("orderId") Long orderId
     ) {
         try {
-            UserData user = userDataRepository.getDataById(id);
+            UserData user = userDataRepository.getOne(id);
             JSONObject order = getOrder(orderId, user);
             if (
-                !order.getString("payment_method").equals("Paygate Pay") ||
+                !order.getString("payment_method").equals(paymentName) ||
                 !order.getString("status").equals("Awaiting Payment")
             ) return ResponseEntity.ok(new HashMap<>());
             System.out.println(order.getString("total_inc_tax"));
@@ -204,6 +219,10 @@ public class UserDataResource {
             resMap.put("PAY_REQUEST_ID", map.get("PAY_REQUEST_ID"));
             resMap.put("CHECKSUM", map.get("CHECKSUM"));
             resMap.put("REFERENCE", map.get("REFERENCE"));
+            Transaction transaction = new Transaction();
+            transaction.setOrderId(orderId);
+            transaction.setPayRequestId(map.get("PAY_REQUEST_ID"));
+            transactionRepository.save(transaction);
             paygateInitResponse.close();
             return ResponseEntity.ok(resMap);
         } catch (IOException ignored) {
@@ -219,15 +238,90 @@ public class UserDataResource {
     @PostMapping("/status/{id}/{orderId}")
     public ResponseEntity<String> status(@PathVariable("id") Long id, @PathVariable("orderId") Long orderId) {
         try {
-            UserData user = userDataRepository.getDataById(id);
+            UserData user = userDataRepository.getOne(id);
             JSONObject order = getOrder(orderId, user);
             if (!order.getString("status").equals("Awaiting Payment")) return ResponseEntity.ok("ok");
+            System.out.println("beenHere");
+            Transaction transaction = transactionRepository.getTransactionByOrder(orderId);
+            String payGateId = user.getPayGateID();
+            String payGateSecret = user.getPayGateSecret();
+            String payRequestId = transaction.getPayRequestId();
+            String reference = user.getId().toString();
+            String checksum = Utils.md5(payGateId + payRequestId + reference + payGateSecret);
+            assert checksum != null;
             Request query = new Request.Builder()
                 .url("https://secure.paygate.co.za/payweb3/query.trans")
-                .post(new FormBody.Builder().add("PAYGATE_ID", user.getPayGateID()).build())
+                .post(
+                    new FormBody.Builder()
+                        .add("PAYGATE_ID", payGateId)
+                        .add("PAY_REQUEST_ID", payRequestId)
+                        .add("REFERENCE", orderId.toString())
+                        .add("CHECKSUM", checksum)
+                        .build()
+                )
                 .build();
-        } catch (IOException e) {}
+            Response response = client.newCall(query).execute();
+            HashMap<String, String> map = Utils.formToMap(Objects.requireNonNull(response.body()).string());
+            //Todo handle error
+            System.out.println(map);
+            int status = 1;
+            switch (Integer.parseInt(map.get("TRANSACTION_STATUS"))) {
+                case 1:
+                case 5:
+                    status = 11;
+                    break;
+                default:
+                    status = 6;
+                    break;
+            }
+            updateOrderStatus(orderId, user, status);
+        } catch (IOException e) {
+            System.out.println(e);
+        }
         return ResponseEntity.ok("ok");
+    }
+
+    @PostMapping("/paygate/update/{id}/{orderId}")
+    public ResponseEntity<String> update(
+        @PathVariable("id") Long id,
+        @PathVariable("orderId") Long orderId,
+        @org.springframework.web.bind.annotation.RequestBody String body
+    ) {
+        try {
+            UserData user = userDataRepository.getOne(id);
+            Transaction transaction = transactionRepository.getTransactionByOrder(orderId);
+            HashMap<String, String> map = Utils.formToMap(body);
+            int status = 1;
+            switch (Integer.parseInt(map.get("TRANSACTION_STATUS"))) {
+                case 1:
+                case 5:
+                    status = 11;
+                    break;
+                default:
+                    status = 6;
+                    break;
+            }
+            updateOrderStatus(orderId, user, status);
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+        return ResponseEntity.ok("OK");
+    }
+
+    void updateOrderStatus(Long orderId, UserData data, int status) throws IOException {
+        Request request = new Request.Builder()
+            .addHeader("X-Auth-Token", data.getToken())
+            .addHeader("Accept", "application/json")
+            .url("https://api.bigcommerce.com/stores/" + data.getStore() + "/v2/orders/" + orderId)
+            .put(
+                okhttp3.RequestBody.create(
+                    new JSONObject().put("status_id", status).toString(),
+                    MediaType.parse("application/json; charset=utf-8")
+                )
+            )
+            .build();
+        Response response = client.newCall(request).execute();
+        System.out.println(response.body().string());
     }
 
     JSONObject getOrder(Long orderId, UserData user) throws IOException {

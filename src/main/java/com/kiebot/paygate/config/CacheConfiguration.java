@@ -55,6 +55,7 @@ public class CacheConfiguration {
             createCache(cm, com.kiebot.paygate.domain.Authority.class.getName());
             createCache(cm, com.kiebot.paygate.domain.User.class.getName() + ".authorities");
             createCache(cm, com.kiebot.paygate.domain.UserData.class.getName());
+            createCache(cm, com.kiebot.paygate.domain.Transaction.class.getName());
             // jhipster-needle-ehcache-add-entry
         };
     }

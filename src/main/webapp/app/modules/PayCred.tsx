@@ -22,11 +22,10 @@ export const PayCred = () => {
       `/api/update/${userId['userId']}?paygateId=${values.paygateId}&paygateSecret=${values.paygateSecret}`
     );
     // eslint-disable-next-line no-console
-    console.log(response);
     if (response.status === 200) {
       setPaygateStatus('Configured');
       toast.success(response.data);
-    } else toast.error(response.data);
+    } else toast.error('Something went wrong!');
   };
   return (
     <div>

@@ -33,7 +33,7 @@ public class UserDataResource {
     private final Logger log = LoggerFactory.getLogger(UserDataResource.class);
     public final String clientID = "je9b53p5syz1qnav9cozg6u61jrfojs";
     public final String clientSecret = "afb8227f93aaf6a19c0785c709f0dfc130d172395e7fe3f228016dcbce6e0978";
-    public final String host = "https://103c-103-153-104-184.ngrok.io";
+    public final String host = "https://bigcommerce-paygate.herokuapp.com";
     public final OkHttpClient client = new OkHttpClient();
     public final UserDataRepository userDataRepository;
     public final TransactionRepository transactionRepository;

@@ -177,7 +177,8 @@ public class UserDataResource {
                 !order.getString("status").equals("Awaiting Payment")
             ) return ResponseEntity.ok(new HashMap<>());
             long orderAmount = ((Double) Double.parseDouble(order.getString("total_inc_tax"))).longValue() * 100;
-            String currency = order.getString("currency_code");
+            //            String currency = order.getString("currency_code");
+            String currency = "ZAR";
             String mail = order.getJSONObject("billing_address").getString("email");
             String payGateId = user.getPayGateID();
             String payGateSecret = user.getPayGateSecret();

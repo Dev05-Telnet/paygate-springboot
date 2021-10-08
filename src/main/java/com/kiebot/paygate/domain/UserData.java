@@ -35,6 +35,9 @@ public class UserData extends AbstractAuditingEntity implements Serializable {
     @Column(name = "pay_gate_secret")
     private String payGateSecret;
 
+    @Column(name = "script_id")
+    private String scriptId;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here
     public Long getId() {
         return id;
@@ -114,6 +117,19 @@ public class UserData extends AbstractAuditingEntity implements Serializable {
         this.payGateSecret = payGateSecret;
     }
 
+    public String getScriptId() {
+        return this.scriptId;
+    }
+
+    public UserData scriptId(String scriptId) {
+        this.scriptId = scriptId;
+        return this;
+    }
+
+    public void setScriptId(String scriptId) {
+        this.scriptId = scriptId;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -143,6 +159,7 @@ public class UserData extends AbstractAuditingEntity implements Serializable {
             ", token='" + getToken() + "'" +
             ", payGateID='" + getPayGateID() + "'" +
             ", payGateSecret='" + getPayGateSecret() + "'" +
+            ", scriptId='" + getScriptId() + "'" +
             "}";
     }
 }

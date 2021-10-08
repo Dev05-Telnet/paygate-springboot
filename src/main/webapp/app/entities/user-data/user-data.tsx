@@ -55,6 +55,7 @@ export const UserData = (props: RouteComponentProps<{ url: string }>) => {
                 <th>Token</th>
                 <th>Pay Gate ID</th>
                 <th>Pay Gate Secret</th>
+                <th>Script Id</th>
                 <th />
               </tr>
             </thead>
@@ -71,6 +72,7 @@ export const UserData = (props: RouteComponentProps<{ url: string }>) => {
                   <td>{userData.token}</td>
                   <td>{userData.payGateID}</td>
                   <td>{userData.payGateSecret}</td>
+                  <td>{userData.scriptId}</td>
                   <td className="text-right">
                     <div className="btn-group flex-btn-group-container">
                       <Button

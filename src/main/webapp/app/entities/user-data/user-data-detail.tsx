@@ -45,6 +45,10 @@ export const UserDataDetail = (props: RouteComponentProps<{ id: string }>) => {
             <span id="payGateSecret">Pay Gate Secret</span>
           </dt>
           <dd>{userDataEntity.payGateSecret}</dd>
+          <dt>
+            <span id="scriptId">Script Id</span>
+          </dt>
+          <dd>{userDataEntity.scriptId}</dd>
         </dl>
         <Button tag={Link} to="/user-data" replace color="info" data-cy="entityDetailsBackButton">
           <FontAwesomeIcon icon="arrow-left" /> <span className="d-none d-md-inline">Back</span>

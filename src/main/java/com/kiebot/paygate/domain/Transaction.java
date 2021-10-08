@@ -1,8 +1,6 @@
 package com.kiebot.paygate.domain;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Date;
 import javax.persistence.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -23,7 +21,7 @@ public class Transaction extends AbstractAuditingEntity implements Serializable 
     private Long id;
 
     @Column(name = "order_id")
-    private Long orderId;
+    private Integer orderId;
 
     @Column(name = "pay_request_id")
     private String payRequestId;
@@ -42,16 +40,16 @@ public class Transaction extends AbstractAuditingEntity implements Serializable 
         return this;
     }
 
-    public Long getOrderId() {
+    public Integer getOrderId() {
         return this.orderId;
     }
 
-    public Transaction orderId(Long orderId) {
+    public Transaction orderId(Integer orderId) {
         this.orderId = orderId;
         return this;
     }
 
-    public void setOrderId(Long orderId) {
+    public void setOrderId(Integer orderId) {
         this.orderId = orderId;
     }
 

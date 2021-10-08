@@ -14,5 +14,5 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
         value = "select * from transaction t where t.order_id = :orderId order by created_date desc limit 1",
         nativeQuery = true
     )
-    Transaction getTransactionByOrder(Long orderId);
+    Transaction getTransactionByOrder(int orderId);
 }

@@ -124,36 +124,39 @@ public class UserDataResource {
         data.setPayGateID(payId);
         data.setPayGateSecret(paySecret);
         userDataRepository.save(data);
-
-        String key = data.getToken();
-        String url = "https://api.bigcommerce.com/stores/" + storeHash + "/v3/content/scripts";
-        String script = Utils.getInjectionScript(host, data.getId());
-        System.out.println(script);
-        JSONObject requestBody = new JSONObject();
-        requestBody
-            .put("name", "paygate-payment-gateway")
-            .put("Discription", "Checkout script for integrating Paygate in bigcommerce")
-            .put("html", script)
-            .put("auto_uninstall", true)
-            .put("load_method", "default")
-            .put("location", "footer")
-            .put("visibility", "order_confirmation")
-            .put("kind", "script_tag")
-            .put("consent_category", "essential");
-        RequestBody body = RequestBody.create(
-            requestBody.toString(),
-            MediaType.parse("application/json; charset=utf-8")
-        );
-        Request createScript = new Request.Builder()
-            .url(url)
-            .addHeader("X-Auth-Token", key)
-            .addHeader("Accept", " application/json")
-            .addHeader("Content-Type", "application/json")
-            .post(body)
-            .build();
         try {
+            if (data.getScriptId() != null && scriptExists(data)) return ResponseEntity.ok("ok");
+            String key = data.getToken();
+            String url = "https://api.bigcommerce.com/stores/" + storeHash + "/v3/content/scripts";
+            String script = Utils.getInjectionScript(host, data.getId());
+            JSONObject requestBody = new JSONObject();
+            requestBody
+                .put("name", "paygate-payment-gateway")
+                .put("Discription", "Checkout script for integrating Paygate in bigcommerce")
+                .put("html", script)
+                .put("auto_uninstall", true)
+                .put("load_method", "default")
+                .put("location", "footer")
+                .put("visibility", "order_confirmation")
+                .put("kind", "script_tag")
+                .put("consent_category", "essential");
+            RequestBody body = RequestBody.create(
+                requestBody.toString(),
+                MediaType.parse("application/json; charset=utf-8")
+            );
+            Request createScript = new Request.Builder()
+                .url(url)
+                .addHeader("X-Auth-Token", key)
+                .addHeader("Accept", " application/json")
+                .addHeader("Content-Type", "application/json")
+                .post(body)
+                .build();
+
             Response response = client.newCall(createScript).execute();
-            System.out.println(response.body().string());
+            JSONObject scriptData = new JSONObject(response.body().string());
+            String uuid = scriptData.getJSONObject("data").getString("uuid");
+            data.setScriptId(uuid);
+            userDataRepository.save(data);
             return ResponseEntity
                 .ok()
                 .body(response.isSuccessful() ? "ok" : Objects.requireNonNull(response.body()).string());
@@ -166,7 +169,7 @@ public class UserDataResource {
     @PostMapping("/process/{id}/{orderId}")
     public ResponseEntity<HashMap<String, String>> process(
         @PathVariable("id") Long id,
-        @PathVariable("orderId") Long orderId
+        @PathVariable("orderId") int orderId
     ) {
         try {
             UserData user = userDataRepository.getOne(id);
@@ -236,7 +239,7 @@ public class UserDataResource {
     }
 
     @PostMapping("/status/{id}/{orderId}")
-    public ResponseEntity<String> status(@PathVariable("id") Long id, @PathVariable("orderId") Long orderId) {
+    public ResponseEntity<String> status(@PathVariable("id") Long id, @PathVariable("orderId") int orderId) {
         try {
             UserData user = userDataRepository.getOne(id);
             JSONObject order = getOrder(orderId, user);
@@ -255,7 +258,7 @@ public class UserDataResource {
                     new FormBody.Builder()
                         .add("PAYGATE_ID", payGateId)
                         .add("PAY_REQUEST_ID", payRequestId)
-                        .add("REFERENCE", orderId.toString())
+                        .add("REFERENCE", orderId + "")
                         .add("CHECKSUM", checksum)
                         .build()
                 )
@@ -284,7 +287,7 @@ public class UserDataResource {
     @PostMapping("/paygate/update/{id}/{orderId}")
     public ResponseEntity<String> update(
         @PathVariable("id") Long id,
-        @PathVariable("orderId") Long orderId,
+        @PathVariable("orderId") int orderId,
         @org.springframework.web.bind.annotation.RequestBody String body
     ) {
         try {
@@ -308,7 +311,20 @@ public class UserDataResource {
         return ResponseEntity.ok("OK");
     }
 
-    void updateOrderStatus(Long orderId, UserData data, int status) throws IOException {
+    boolean scriptExists(UserData user) throws IOException {
+        Request request = new Request.Builder()
+            .url("https://api.bigcommerce.com/stores/" + user.getStore() + "/v3/content/scripts/" + user.getScriptId())
+            .get()
+            .addHeader("accept", "application/json")
+            .addHeader("content-type", "application/json")
+            .addHeader("x-auth-token", user.getToken())
+            .build();
+
+        Response response = client.newCall(request).execute();
+        return response.isSuccessful();
+    }
+
+    void updateOrderStatus(int orderId, UserData data, int status) throws IOException {
         Request request = new Request.Builder()
             .addHeader("X-Auth-Token", data.getToken())
             .addHeader("Accept", "application/json")
@@ -324,7 +340,7 @@ public class UserDataResource {
         System.out.println(response.body().string());
     }
 
-    JSONObject getOrder(Long orderId, UserData user) throws IOException {
+    JSONObject getOrder(int orderId, UserData user) throws IOException {
         String key = user.getToken();
         String url = "https://api.bigcommerce.com/stores/" + user.getStore() + "/v2/orders/" + orderId;
         Request order = new Request.Builder()

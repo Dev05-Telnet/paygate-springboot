@@ -44,6 +44,9 @@ class UserDataResourceIT {
     private static final String DEFAULT_PAY_GATE_SECRET = "AAAAAAAAAA";
     private static final String UPDATED_PAY_GATE_SECRET = "BBBBBBBBBB";
 
+    private static final String DEFAULT_SCRIPT_ID = "AAAAAAAAAA";
+    private static final String UPDATED_SCRIPT_ID = "BBBBBBBBBB";
+
     private static final String ENTITY_API_URL = "/api/user-data";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
@@ -73,7 +76,8 @@ class UserDataResourceIT {
             .store(DEFAULT_STORE)
             .token(DEFAULT_TOKEN)
             .payGateID(DEFAULT_PAY_GATE_ID)
-            .payGateSecret(DEFAULT_PAY_GATE_SECRET);
+            .payGateSecret(DEFAULT_PAY_GATE_SECRET)
+            .scriptId(DEFAULT_SCRIPT_ID);
         return userData;
     }
 
@@ -89,7 +93,8 @@ class UserDataResourceIT {
             .store(UPDATED_STORE)
             .token(UPDATED_TOKEN)
             .payGateID(UPDATED_PAY_GATE_ID)
-            .payGateSecret(UPDATED_PAY_GATE_SECRET);
+            .payGateSecret(UPDATED_PAY_GATE_SECRET)
+            .scriptId(UPDATED_SCRIPT_ID);
         return userData;
     }
 
@@ -120,6 +125,7 @@ class UserDataResourceIT {
         assertThat(testUserData.getToken()).isEqualTo(DEFAULT_TOKEN);
         assertThat(testUserData.getPayGateID()).isEqualTo(DEFAULT_PAY_GATE_ID);
         assertThat(testUserData.getPayGateSecret()).isEqualTo(DEFAULT_PAY_GATE_SECRET);
+        assertThat(testUserData.getScriptId()).isEqualTo(DEFAULT_SCRIPT_ID);
     }
 
     @Test
@@ -160,7 +166,8 @@ class UserDataResourceIT {
             .andExpect(jsonPath("$.[*].store").value(hasItem(DEFAULT_STORE)))
             .andExpect(jsonPath("$.[*].token").value(hasItem(DEFAULT_TOKEN)))
             .andExpect(jsonPath("$.[*].payGateID").value(hasItem(DEFAULT_PAY_GATE_ID)))
-            .andExpect(jsonPath("$.[*].payGateSecret").value(hasItem(DEFAULT_PAY_GATE_SECRET)));
+            .andExpect(jsonPath("$.[*].payGateSecret").value(hasItem(DEFAULT_PAY_GATE_SECRET)))
+            .andExpect(jsonPath("$.[*].scriptId").value(hasItem(DEFAULT_SCRIPT_ID)));
     }
 
     @Test
@@ -179,7 +186,8 @@ class UserDataResourceIT {
             .andExpect(jsonPath("$.store").value(DEFAULT_STORE))
             .andExpect(jsonPath("$.token").value(DEFAULT_TOKEN))
             .andExpect(jsonPath("$.payGateID").value(DEFAULT_PAY_GATE_ID))
-            .andExpect(jsonPath("$.payGateSecret").value(DEFAULT_PAY_GATE_SECRET));
+            .andExpect(jsonPath("$.payGateSecret").value(DEFAULT_PAY_GATE_SECRET))
+            .andExpect(jsonPath("$.scriptId").value(DEFAULT_SCRIPT_ID));
     }
 
     @Test
@@ -206,7 +214,8 @@ class UserDataResourceIT {
             .store(UPDATED_STORE)
             .token(UPDATED_TOKEN)
             .payGateID(UPDATED_PAY_GATE_ID)
-            .payGateSecret(UPDATED_PAY_GATE_SECRET);
+            .payGateSecret(UPDATED_PAY_GATE_SECRET)
+            .scriptId(UPDATED_SCRIPT_ID);
 
         restUserDataMockMvc
             .perform(
@@ -225,6 +234,7 @@ class UserDataResourceIT {
         assertThat(testUserData.getToken()).isEqualTo(UPDATED_TOKEN);
         assertThat(testUserData.getPayGateID()).isEqualTo(UPDATED_PAY_GATE_ID);
         assertThat(testUserData.getPayGateSecret()).isEqualTo(UPDATED_PAY_GATE_SECRET);
+        assertThat(testUserData.getScriptId()).isEqualTo(UPDATED_SCRIPT_ID);
     }
 
     @Test
@@ -299,7 +309,7 @@ class UserDataResourceIT {
         UserData partialUpdatedUserData = new UserData();
         partialUpdatedUserData.setId(userData.getId());
 
-        partialUpdatedUserData.payGateID(UPDATED_PAY_GATE_ID);
+        partialUpdatedUserData.payGateID(UPDATED_PAY_GATE_ID).scriptId(UPDATED_SCRIPT_ID);
 
         restUserDataMockMvc
             .perform(
@@ -318,6 +328,7 @@ class UserDataResourceIT {
         assertThat(testUserData.getToken()).isEqualTo(DEFAULT_TOKEN);
         assertThat(testUserData.getPayGateID()).isEqualTo(UPDATED_PAY_GATE_ID);
         assertThat(testUserData.getPayGateSecret()).isEqualTo(DEFAULT_PAY_GATE_SECRET);
+        assertThat(testUserData.getScriptId()).isEqualTo(UPDATED_SCRIPT_ID);
     }
 
     @Test
@@ -337,7 +348,8 @@ class UserDataResourceIT {
             .store(UPDATED_STORE)
             .token(UPDATED_TOKEN)
             .payGateID(UPDATED_PAY_GATE_ID)
-            .payGateSecret(UPDATED_PAY_GATE_SECRET);
+            .payGateSecret(UPDATED_PAY_GATE_SECRET)
+            .scriptId(UPDATED_SCRIPT_ID);
 
         restUserDataMockMvc
             .perform(
@@ -356,6 +368,7 @@ class UserDataResourceIT {
         assertThat(testUserData.getToken()).isEqualTo(UPDATED_TOKEN);
         assertThat(testUserData.getPayGateID()).isEqualTo(UPDATED_PAY_GATE_ID);
         assertThat(testUserData.getPayGateSecret()).isEqualTo(UPDATED_PAY_GATE_SECRET);
+        assertThat(testUserData.getScriptId()).isEqualTo(UPDATED_SCRIPT_ID);
     }
 
     @Test

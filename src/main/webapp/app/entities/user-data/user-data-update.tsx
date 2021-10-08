@@ -100,6 +100,13 @@ export const UserDataUpdate = (props: RouteComponentProps<{ id: string }>) => {
                 data-cy="payGateSecret"
                 type="text"
               />
+              <ValidatedField
+                label="Script Id"
+                id="user-data-scriptId"
+                name="scriptId"
+                data-cy="scriptId"
+                type="text"
+              />
               <Button
                 tag={Link}
                 id="cancel-save"

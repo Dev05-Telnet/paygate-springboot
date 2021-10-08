@@ -29,6 +29,9 @@
             <column name="pay_gate_secret" type="varchar(255)">
                     <constraints nullable="true" />
             </column>
+            <column name="script_id" type="varchar(255)">
+                    <constraints nullable="true" />
+            </column>
             <column name="created_by" type="varchar(50)"/>
             <column name="created_date" type="timestamp"/>
             <column name="last_modified_by" type="varchar(50)"/>
@@ -61,6 +64,7 @@
             <column name="token" type="string"/>
             <column name="pay_gate_id" type="string"/>
             <column name="pay_gate_secret" type="string"/>
+            <column name="script_id" type="string"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>

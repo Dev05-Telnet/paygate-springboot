@@ -5,6 +5,7 @@ export interface IUserData {
   token?: string | null;
   payGateID?: string | null;
   payGateSecret?: string | null;
+  scriptId?: string | null;
 }
 
 export const defaultValue: Readonly<IUserData> = {};

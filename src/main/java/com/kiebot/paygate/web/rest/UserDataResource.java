@@ -226,7 +226,7 @@ public class UserDataResource {
             transaction.setPayRequestId(map.get("PAY_REQUEST_ID"));
             transactionRepository.save(transaction);
             paygateInitResponse.close();
-            System.out.println(currency + "\t" + resMap);
+            System.out.println(currency + "\t" + map);
             return ResponseEntity.ok(resMap);
         } catch (IOException ignored) {
             return ResponseEntity.internalServerError().body(new HashMap<>());

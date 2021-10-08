@@ -39,13 +39,11 @@ public class UserDataResource {
     public final TransactionRepository transactionRepository;
 
     @SuppressWarnings("FieldCanBeLocal")
-    private final String paymentName = "Paygate Pay";
+    private final String paymentName = "Paygate";
 
-    String currency = "ZAR";
     String return_url = host + "/api/completed";
     String locale = "en-za";
     String country = "ZAF";
-    String mail = "customer@kiebot.za";
     String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
 
     public UserDataResource(UserDataRepository userDataRepository, TransactionRepository transactionRepository) {
@@ -153,7 +151,7 @@ public class UserDataResource {
                 .build();
 
             Response response = client.newCall(createScript).execute();
-            JSONObject scriptData = new JSONObject(response.body().string());
+            JSONObject scriptData = new JSONObject(Objects.requireNonNull(response.body()).string());
             String uuid = scriptData.getJSONObject("data").getString("uuid");
             data.setScriptId(uuid);
             userDataRepository.save(data);
@@ -178,8 +176,9 @@ public class UserDataResource {
                 !order.getString("payment_method").equals(paymentName) ||
                 !order.getString("status").equals("Awaiting Payment")
             ) return ResponseEntity.ok(new HashMap<>());
-            System.out.println(order.getString("total_inc_tax"));
             long orderAmount = ((Double) Double.parseDouble(order.getString("total_inc_tax"))).longValue() * 100;
+            String currency = order.getString("currency_code");
+            String mail = order.getJSONObject("billing_address").getString("email");
             String payGateId = user.getPayGateID();
             String payGateSecret = user.getPayGateSecret();
             String reference = user.getId().toString();
@@ -265,21 +264,10 @@ public class UserDataResource {
                 .build();
             Response response = client.newCall(query).execute();
             HashMap<String, String> map = Utils.formToMap(Objects.requireNonNull(response.body()).string());
-            //Todo handle error
-            System.out.println(map);
-            int status = 1;
-            switch (Integer.parseInt(map.get("TRANSACTION_STATUS"))) {
-                case 1:
-                case 5:
-                    status = 11;
-                    break;
-                default:
-                    status = 6;
-                    break;
-            }
+            int status = getStatus(Integer.parseInt(map.get("TRANSACTION_STATUS")));
             updateOrderStatus(orderId, user, status);
         } catch (IOException e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
         return ResponseEntity.ok("ok");
     }
@@ -292,23 +280,27 @@ public class UserDataResource {
     ) {
         try {
             UserData user = userDataRepository.getOne(id);
-            Transaction transaction = transactionRepository.getTransactionByOrder(orderId);
             HashMap<String, String> map = Utils.formToMap(body);
-            int status = 1;
-            switch (Integer.parseInt(map.get("TRANSACTION_STATUS"))) {
-                case 1:
-                case 5:
-                    status = 11;
-                    break;
-                default:
-                    status = 6;
-                    break;
-            }
+            int status = getStatus(Integer.parseInt(map.get("TRANSACTION_STATUS")));
             updateOrderStatus(orderId, user, status);
         } catch (IOException e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
         return ResponseEntity.ok("OK");
+    }
+
+    int getStatus(int transactionStatus) {
+        int status = 1;
+        switch (transactionStatus) {
+            case 1:
+            case 5:
+                status = 11;
+                break;
+            default:
+                status = 6;
+                break;
+        }
+        return status;
     }
 
     boolean scriptExists(UserData user) throws IOException {
@@ -337,7 +329,6 @@ public class UserDataResource {
             )
             .build();
         Response response = client.newCall(request).execute();
-        System.out.println(response.body().string());
     }
 
     JSONObject getOrder(int orderId, UserData user) throws IOException {

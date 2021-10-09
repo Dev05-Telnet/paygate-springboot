@@ -27,14 +27,17 @@ export const PayCred = () => {
       toast.success(response.data);
     } else toast.error('Something went wrong!');
   };
+  const url = new URL(window.location.href);
+  const payId = url.searchParams.get('id');
+  const secret = url.searchParams.get('secret');
   return (
     <div>
       <BgContainer>
         <WhiteContainer>
-          <p>Paygate configuration Status : {paygateStatus}</p>
+          <p>Paygate configuration Status : {payId ? 'Configured' : paygateStatus}</p>
           <AvForm onValidSubmit={click}>
-            <AvField name="paygateId" label="Paygate Id" required />
-            <AvField name="paygateSecret" label="Paygate Secret" required />
+            <AvField name="paygateId" label="Paygate Id" required defaultValue={payId} />
+            <AvField name="paygateSecret" label="Paygate Secret" required defaultValue={secret} />
             <Button>Submit</Button>
           </AvForm>
         </WhiteContainer>

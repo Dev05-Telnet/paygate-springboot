@@ -106,7 +106,16 @@ public class UserDataResource {
         int userId = userInfo.getJSONObject("user").getInt("id");
         UserData user = userDataRepository.getDataByUserId(userId);
         return user != null
-            ? new ModelAndView("redirect:" + host + "/update/" + user.getId() + "?script=false")
+            ? new ModelAndView(
+                "redirect:" +
+                host +
+                "/update/" +
+                user.getId() +
+                "?id=" +
+                user.getPayGateID() +
+                "&secret=" +
+                user.getPayGateSecret()
+            )
             : new ModelAndView("redirect:" + host + "/404.html");
     }
 
